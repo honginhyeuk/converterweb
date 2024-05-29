@@ -25,7 +25,14 @@ SECRET_KEY = 'django-insecure-=stmgqfgnzfu8cn=jj(0tb!rn3063(aqa0h6dqqg$e!)$c9s77
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# settings.py
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'port-0-converterweb-1pgyr2mlvb2vftm.sel5.cloudtype.app',  # Cloudtype에서 제공한 도메인 추가
+    # 필요한 경우 추가적인 도메인
+]
 
 
 # Application definition

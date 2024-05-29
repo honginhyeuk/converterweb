@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Converter</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .converter-box {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .converter-box select,
+        .converter-box textarea,
+        .converter-box button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        .converter-box textarea {
+            resize: none;
+        }
+        .converter-box button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .converter-box button:hover {
+            background-color: #0056b3;
+        }
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .btn-group button {
+            width: 30%;
+        }
+    </style>
+    <script>
+        function convertText() {
+            var text = document.getElementById("strText").value;
+            var convertTo = document.getElementById("convertType").value;
+
+            fetch("/converter/convert/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: "text=" + encodeURIComponent(text) + "&convert_to=" + encodeURIComponent(convertTo)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("convertToCamel").value = data.converted_text;
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function fnReset() {
+            document.getElementById("strText").value = "";
+            document.getElementById("convertToCamel").value = "";
+        }
+
+        function fnCopy() {
+            var copyText = document.getElementById("convertToCamel");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Copied the text: " + copyText.value);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Text Converter</h2>
+        <div class="converter-box">
+            <form name="srcFrm" style="height: auto !important;">
+                <div>
+                    <label for="convertType">변환 종류 선택</label>
+                    <select id="convertType">
+                        <option value="camel">Camel Case</option>
+                        <option value="pascal">Pascal Case</option>
+                        <option value="snake">Snake Case</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="strText">변환전</label>
+                    <textarea id="strText" placeholder="변환할 데이터를 입력하세요 (abcDef, AbcDef, abc_def)" style="height:200px;"></textarea>
+                </div>
+                <div>
+                    <label for="convertToCamel">변환후</label>
+                    <textarea id="convertToCamel" placeholder="변환 결과가 여기에 표시됩니다." readonly="" style="height:200px;"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="button" onclick="fnReset();">초기화</button>
+                    <button type="button" onclick="convertText();">변환</button>
+                    <button type="button" onclick="fnCopy();">클립보드 복사</button>
+                </div>
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</body>
+</html>

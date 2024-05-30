@@ -9,26 +9,29 @@
             background-color: #f5f5f5;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .container {
             width: 80%;
-            margin: 0 auto;
+            margin: 20px;
             padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         h2 {
             text-align: center;
             color: #333;
         }
         .converter-box {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            margin: 20px 0;
         }
         .converter-box select,
         .converter-box textarea,
-        .converter-box button {
+        .converter-box button,
+        .converter-box input {
             width: 100%;
             margin: 10px 0;
             padding: 10px;
@@ -54,23 +57,73 @@
         .btn-group button {
             width: 30%;
         }
+        .footer {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .ad-container,
+        .sidebar {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .ad-container{
+            height: 30px;
+        }
+        .sidebar {
+            width: 160px;
+            position: fixed;
+            right: 20px;
+            top: 20px;
+        }
+        .copyright {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
     <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
         function convertText() {
             var text = document.getElementById("strText").value;
             var convertTo = document.getElementById("convertType").value;
+            var userName = document.getElementById("userName").value;
 
             fetch("/converter/convert/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
-                    "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+                    "X-CSRFToken": csrftoken
                 },
                 body: "text=" + encodeURIComponent(text) + "&convert_to=" + encodeURIComponent(convertTo)
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("convertToCamel").value = data.converted_text;
+                var result = data.converted_text;
+                if (userName) {
+                    result = userName + ", " + result;
+                }
+                document.getElementById("convertToCamel").value = result;
             })
             .catch(error => console.error("Error:", error));
         }
@@ -78,6 +131,7 @@
         function fnReset() {
             document.getElementById("strText").value = "";
             document.getElementById("convertToCamel").value = "";
+            document.getElementById("userName").value = "";
         }
 
         function fnCopy() {
@@ -89,10 +143,18 @@
     </script>
 </head>
 <body>
+    <div>
+        <ins class="kakao_ad_area" style="display:none;"
+        data-ad-unit = "DAN-IpDBWD3es0gwJhPr"
+        data-ad-width = "728"
+        data-ad-height = "90"></ins>
+        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+    </div>
     <div class="container">
-        <h2>Text Converter</h2>
+        <h2>스타일 변환기</h2>
         <div class="converter-box">
             <form name="srcFrm" style="height: auto !important;">
+                {% csrf_token %}
                 <div>
                     <label for="convertType">변환 종류 선택</label>
                     <select id="convertType">
@@ -114,12 +176,25 @@
                     <button type="button" onclick="convertText();">변환</button>
                     <button type="button" onclick="fnCopy();">클립보드 복사</button>
                 </div>
-                {% csrf_token %}
             </form>
         </div>
-        <div class="footer">
-            made by 홍이녁
+        <div class="ad-container">
+            <ins class="kakao_ad_area" style="display:none;"
+            data-ad-unit = "DAN-Hjp8ePtwhYzYtFJn"
+            data-ad-width = "320"
+            data-ad-height = "100"></ins>
+            <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
         </div>
+    </div>
+    <div class="sidebar">
+        <ins class="kakao_ad_area" style="display:none;"
+        data-ad-unit = "DAN-7kl5FzHABUYiHRR2"
+        data-ad-width = "160"
+        data-ad-height = "600"></ins>
+        <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+    </div>
+    <div class="copyright">
+        © 2024/05/30-홍이녁-
     </div>
 </body>
 </html>
